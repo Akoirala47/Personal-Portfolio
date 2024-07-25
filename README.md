@@ -1,6 +1,3 @@
-Here's a revamped README for your Personal Portfolio project, reflecting the details you've shared:
-
----
 
 # Personal Portfolio
 
