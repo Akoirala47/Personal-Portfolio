@@ -22,9 +22,8 @@ const Resume = () => {
       >
         <iframe
           src={resume}
-          width="80%"
-          height="900px"
-          className="border rounded-lg shadow-lg"
+          className="w-full h-screen sm:h-[600px] md:h-[900px] border rounded-lg shadow-lg"
+          style={{ border: 'none' }}
         />
       </motion.div>
     </div>
