@@ -1,3 +1,4 @@
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { RiReactjsLine } from "react-icons/ri";
 import { TbBrandNextjs } from "react-icons/tb";
@@ -6,6 +7,43 @@ import { FaNodeJs } from "react-icons/fa";
 import { BiLogoPostgresql } from "react-icons/bi";
 
 const Technologies = () => {
+  const scrollContainerRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Adjust this value based on your breakpoint
+    };
+
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      const handleTouchStart = (e) => {
+        scrollContainerRef.current.dataset.startX = e.touches[0].clientX;
+        scrollContainerRef.current.dataset.scrollLeft = scrollContainerRef.current.scrollLeft;
+      };
+
+      const handleTouchMove = (e) => {
+        const startX = parseInt(scrollContainerRef.current.dataset.startX, 10);
+        const scrollLeft = parseInt(scrollContainerRef.current.dataset.scrollLeft, 10);
+        const moveX = e.touches[0].clientX - startX;
+        scrollContainerRef.current.scrollLeft = scrollLeft - moveX;
+      };
+
+      scrollContainerRef.current.addEventListener('touchstart', handleTouchStart);
+      scrollContainerRef.current.addEventListener('touchmove', handleTouchMove);
+
+      return () => {
+        scrollContainerRef.current.removeEventListener('touchstart', handleTouchStart);
+        scrollContainerRef.current.removeEventListener('touchmove', handleTouchMove);
+      };
+    }
+  }, [isMobile]);
+
   const icons = [
     { Icon: RiReactjsLine, color: "text-cyan-400" },
     { Icon: TbBrandNextjs, color: "" },
@@ -34,7 +72,10 @@ const Technologies = () => {
         viewport={{ once: true }}
         className="relative overflow-hidden"
       >
-        <div className="flex animate-scroll">
+        <div
+          ref={scrollContainerRef}
+          className={`flex ${isMobile ? 'overflow-x-auto' : 'animate-scroll'}`}
+        >
           {[...icons, ...icons, ...icons].map((icon, index) => (
             <div key={index} className="rounded-2xl border-4 border-neutral-800 p-4 mx-4 flex-shrink-0">
               <icon.Icon className={`text-7xl ${icon.color}`} />
