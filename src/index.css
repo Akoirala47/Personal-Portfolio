@@ -9,3 +9,9 @@
 html {
   scroll-behavior: smooth;
 }
+/* Tailwind CSS */
+ul {
+  border-bottom: 2px solid #000; /* Adjust color and thickness as needed */
+}
+
+
