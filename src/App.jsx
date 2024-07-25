@@ -6,6 +6,7 @@ import Experience from './components/Experience';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Resume from './components/Resume';
+import SendMessage from './components/SendMessage';
 
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
         <Resume/>
         <Experience/>
         <Projects/>
+        <SendMessage/>
         <Contact/>
       </div>
       

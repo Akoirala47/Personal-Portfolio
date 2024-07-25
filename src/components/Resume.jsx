@@ -15,7 +15,7 @@ const Resume = () => {
       </motion.h2>
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}  // Start scaled down and invisible
-        whileInView={{ scale: 1, opacity: 1 }} // Animate to normal size and visible
+        whileInView={{ scale: 1, opacity: 1 }} // Animate to normal size and visible e
         viewport={{ once: true }} // Animation occurs only once when the element comes into view
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="flex justify-center my-8"
