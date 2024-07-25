@@ -3,7 +3,7 @@ import { PROJECTS } from "../constants";
 
 const Projects = () => {
   return (
-    <div className="border-b border-neutral-900 pb-4">
+    <div id="projects" className="border-b border-neutral-900 pb-4">
       <motion.h2
         initial={{ y: 50, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}

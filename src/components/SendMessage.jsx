@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 const SendMessage = () => {
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -39,7 +40,7 @@ const SendMessage = () => {
   };
 
   return (
-    <div className="border-b border-neutral-900 pb-4">
+    <div id="sendMessage" className="border-b border-neutral-900 pb-4">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}

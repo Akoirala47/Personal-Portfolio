@@ -3,7 +3,7 @@ import { EXPERIENCES } from "../constants";
 
 const Experience = () => {
   return (
-    <div className="border-b border-neutral-900 pb-4">
+    <div id="experience" className="border-b border-neutral-900 pb-4">
       <motion.h2
         initial={{ y: 50, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
