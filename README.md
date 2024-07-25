@@ -9,7 +9,6 @@ Welcome to my Personal Portfolio! This project showcases my skills, experiences,
 - **Interactive Navbar**: Features a 3-dash dropdown menu on mobile devices and a smooth scrolling effect for desktop.
 - **Technology Icons**: Horizontal scrollable train of technology icons, draggable on mobile devices.
 - **Smooth Scrolling**: Use smooth scrolling for in-page navigation.
-- **3D Cat Model**: Users can upload 5 photos of themselves to create a 3D cat model (planned feature).
 
 ## 🛠️ Technologies Used
 
