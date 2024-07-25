@@ -5,6 +5,7 @@ import Technologies from './components/Technologies';
 import Experience from './components/Experience';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
+import Resume from './components/Resume';
 
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
         <Hero/>
         <About/>
         <Technologies/>
+        <Resume/>
         <Experience/>
         <Projects/>
         <Contact/>
