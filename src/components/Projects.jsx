@@ -64,6 +64,20 @@ const Projects = () => {
                   </motion.span>
                 ))}
               </div>
+              <div className="mt-2">
+                {project.website && (
+                  <motion.a
+                    href={project.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-neutral-400 hover:underline"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    View Website
+                  </motion.a>
+                )}
+              </div>
             </div>
           </motion.div>
         ))}

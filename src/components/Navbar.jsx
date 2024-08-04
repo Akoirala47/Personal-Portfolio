@@ -101,7 +101,7 @@ const Navbar = () => {
               <FaLinkedinIn />
             </a>
             <a
-              href="https://github.com/aayushkoi"
+              href="https://github.com/Akoirala47"
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors duration-300 hover:text-gray-800"
