@@ -38,6 +38,15 @@ export const EXPERIENCES = [
 
 export const PROJECTS = [
   {
+    title: "Chef Krrish",
+    image: null, 
+    description: 
+      "Developed a web app integrating Firebase Authentication, Firestore for user management, and OpenRouter API with LLaMA 3.1 model to provide personalized dietary advice.",
+    technologies: ["React", "Next.js", "Firebase", "OpenRouter API", "LLaMA 3.1"],
+    github: "https://github.com/Akoirala47/chatbot",
+    website: "https://chefkrrish.vercel.app/",
+  },
+  {
     title: "Inventory Management Web App",
     image: null,
     description: 
