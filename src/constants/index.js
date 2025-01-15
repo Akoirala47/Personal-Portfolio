@@ -12,6 +12,7 @@ export const EXPERIENCES = [
     company: "Arctex",
     description: `Developed CollegeAppAssist, an AI-powered Chrome extension using React.js, Tailwind CSS, and ChatGPT API to streamline the college application process for students. Applied agile methodologies to deliver a user-friendly tool that significantly improved efficiency.`,
     technologies: ["React.js", "Tailwind CSS", "JavaScript", "Express.js", "ChatGPT API", "Agile Methodologies"],
+  },
   {
     year: "Summer 2024",
     role: "Undergraduate Research Assistant",
@@ -43,6 +44,15 @@ export const EXPERIENCES = [
 ];
 
 export const PROJECTS = [
+  {
+    title: "Nutricard",
+    image: null,
+    description: 
+      "A modern web application built with Next.js that combines AI-generated flashcards with a seamless learning experience. Features include AI-powered flashcard generation, secure payments via Stripe, Firebase integration for data storage, and interactive study sessions.",
+    technologies: ["Next.js 14", "Tailwind CSS", "Firebase", "Stripe", "Meta Llama 3.1", "Firebase Auth"],
+    github: "https://github.com/Professor-Virus/Nutricard",
+    website: "https://nutricard.vercel.app",
+  },
   {
     title: "Chef Krrish",
     image: null, 
