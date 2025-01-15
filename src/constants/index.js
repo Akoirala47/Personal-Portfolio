@@ -1,11 +1,17 @@
 import project1 from "../assets/projects/project-1.jpg";
 import project2 from "../assets/projects/project-2.jpg";
 
-export const HERO_CONTENT = `I am a dedicated Software Developer with a passion for creating dynamic and scalable web applications. With hands-on experience in both front-end and back-end technologies, I excel in using React, Next.js, and Node.js to build responsive user interfaces and efficient server-side applications. My expertise extends to database management with PostgreSQL and MongoDB, ensuring robust data handling and storage solutions. I am committed to leveraging my skills in JavaScript, TypeScript, C, Python, and various other programming languages to deliver innovative solutions that enhance user experiences and drive business success.`;
+export const HERO_CONTENT = `I’m a Computer Science student at UMass Amherst with a knack for building scalable, innovative web applications. I’ve worked with React.js, Next.js, Node.js, and Express.js to create responsive, user-friendly solutions, and I’m comfortable managing data with PostgreSQL, MongoDB, and Firebase Firestore. My projects, like Chef Krish and the Inventory Management Web App, highlight my ability to integrate AI (LLAMA 3.1) and image classification (MobileNet) into practical, user-centric tools. With a solid foundation in Python, JavaScript, and Java, I’m passionate about crafting impactful solutions that push the boundaries of what technology can do.`;
 
-export const ABOUT_TEXT = `I am a dedicated and versatile Software Developer with a passion for creating efficient and user-friendly web applications. With a few years of professional experience, I have worked with a variety of technologies, including React, Next.js, Node.js, MySQL, PostgreSQL, and MongoDB. During my time at the University of Massachusetts Amherst, I conducted research focused on Machine Learning security, working closely with a graduate leader to explore innovative solutions in this field. This experience not only honed my technical skills but also deepened my understanding of the ethical and security implications in AI and machine learning. My journey in web development began with a deep curiosity for how things work, and it has evolved into a career where I continuously strive to learn and adapt to new challenges. I thrive in collaborative environments and enjoy solving complex problems to deliver high-quality solutions.`;
+export const ABOUT_TEXT = `Beyond coding, I’m passionate about the intersection of technology and ethics, especially in AI and machine learning. My research in ML security at UMass Amherst taught me not just how to optimize models, but also how to think critically about their impact. I thrive in collaborative environments, love tackling complex problems, and am always eager to learn and grow. For me, technology isn’t just about building things, it’s about creating solutions that make a difference.`;
 
 export const EXPERIENCES = [
+  {
+    year: "Fall 2024",
+    role: "Software Engineer Intern",
+    company: "Arctex",
+    description: `Developed CollegeAppAssist, an AI-powered Chrome extension using React.js, Tailwind CSS, and ChatGPT API to streamline the college application process for students. Applied agile methodologies to deliver a user-friendly tool that significantly improved efficiency.`,
+    technologies: ["React.js", "Tailwind CSS", "JavaScript", "Express.js", "ChatGPT API", "Agile Methodologies"],
   {
     year: "Summer 2024",
     role: "Undergraduate Research Assistant",
