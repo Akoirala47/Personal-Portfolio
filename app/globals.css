@@ -262,6 +262,8 @@ a { color: inherit; }
   flex-shrink: 0;
 }
 .r-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-link { color: var(--text-2); text-decoration: none; }
+.r-link:hover { color: var(--text); }
 
 .footer-mini {
   margin-top: auto;

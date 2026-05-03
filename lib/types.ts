@@ -41,7 +41,7 @@ export interface Post {
 
 export interface ReadingItem {
   id: string;
-  tag: string;
-  title: string;
+  name: string;
+  url: string;
   display_order: number;
 }

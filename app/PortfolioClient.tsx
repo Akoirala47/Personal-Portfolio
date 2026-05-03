@@ -233,8 +233,9 @@ function Sidebar({ view, setView, readingItems }: SidebarProps) {
         {readingItems.length > 0 ? (
           readingItems.map((item) => (
             <div key={item.id} className="reading-row">
-              <span className="r-tag">{item.tag}</span>
-              <span className="r-title">{item.title}</span>
+              <a className="r-title r-link" href={item.url} target="_blank" rel="noreferrer">
+                {item.name} →
+              </a>
             </div>
           ))
         ) : (

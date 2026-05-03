@@ -934,7 +934,7 @@ interface SidebarTabProps {
   onRefresh: () => void;
 }
 
-const EMPTY_READING = { tag: "", title: "" };
+const EMPTY_READING = { name: "", url: "" };
 
 function SidebarTab({ readingItems, onRefresh }: SidebarTabProps) {
   const [form, setForm] = useState(EMPTY_READING);
@@ -943,7 +943,7 @@ function SidebarTab({ readingItems, onRefresh }: SidebarTabProps) {
 
   const openEdit = (item: ReadingItem) => {
     setEditId(item.id);
-    setForm({ tag: item.tag, title: item.title });
+    setForm({ name: item.name, url: item.url });
   };
 
   const reset = () => {
@@ -993,16 +993,17 @@ function SidebarTab({ readingItems, onRefresh }: SidebarTabProps) {
         <div className="admin-form-row">
           <input
             className="admin-input"
-            placeholder="tag (e.g. paper, book, article)"
-            value={form.tag}
-            onChange={(e) => setForm({ ...form, tag: e.target.value })}
+            placeholder="name (e.g. Attention Is All You Need)"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
           />
           <input
             className="admin-input"
-            placeholder="title"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            placeholder="url (https://…)"
+            type="url"
+            value={form.url}
+            onChange={(e) => setForm({ ...form, url: e.target.value })}
             required
           />
         </div>
@@ -1021,9 +1022,9 @@ function SidebarTab({ readingItems, onRefresh }: SidebarTabProps) {
       <div className="admin-list">
         {readingItems.map((item) => (
           <div key={item.id} className="admin-list-item">
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <span className="post-tag">{item.tag}</span>
-              <span>{item.title}</span>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", minWidth: 0 }}>
+              <span className="admin-list-item-title">{item.name}</span>
+              <span className="admin-list-item-sub" style={{ margin: 0 }}>{item.url}</span>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button className="admin-btn admin-btn-sm" onClick={() => openEdit(item)}>
