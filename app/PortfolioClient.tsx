@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { PROFILE } from "@/lib/profile";
 import { Experience, Project, Post, ReadingItem } from "@/lib/types";
@@ -367,16 +367,19 @@ function Tabs({ tab, setTab, counts }: TabsProps) {
 interface ExperienceCardProps {
   exp: Experience;
   idx: number;
+  initialLiked: boolean;
+  onLike: () => Promise<{ liked: boolean; count: number } | null>;
 }
 
-function ExperienceCard({ exp, idx }: ExperienceCardProps) {
-  const [liked, setLiked] = useState(false);
+function ExperienceCard({ exp, idx, initialLiked, onLike }: ExperienceCardProps) {
+  const [liked, setLiked] = useState(initialLiked);
   const [count, setCount] = useState(exp.likes);
-  const onLike = () => {
-    setLiked((l) => {
-      setCount((c) => c + (l ? -1 : 1));
-      return !l;
-    });
+
+  useEffect(() => { setLiked(initialLiked); }, [initialLiked]);
+
+  const handleLike = async () => {
+    const res = await onLike();
+    if (res) { setLiked(res.liked); setCount(res.count); }
   };
   const isLive = exp.end_date === "Present";
   return (
@@ -423,7 +426,7 @@ function ExperienceCard({ exp, idx }: ExperienceCardProps) {
         <div className="exp-foot">
           <button
             className={"like " + (liked ? "liked" : "")}
-            onClick={onLike}
+            onClick={handleLike}
           >
             <Icon name={liked ? "heart-fill" : "heart"} size={14} />
             <span className="mono">{count.toLocaleString()}</span>
@@ -565,11 +568,21 @@ function ProjectThumb({ p }: ProjectThumbProps) {
 
 interface ProjectCardProps {
   p: Project;
+  initialLiked: boolean;
+  onLike: () => Promise<{ liked: boolean; count: number } | null>;
 }
 
-function ProjectCard({ p }: ProjectCardProps) {
-  const [liked, setLiked] = useState(false);
+function ProjectCard({ p, initialLiked, onLike }: ProjectCardProps) {
+  const [liked, setLiked] = useState(initialLiked);
   const [count, setCount] = useState(p.likes);
+
+  useEffect(() => { setLiked(initialLiked); }, [initialLiked]);
+
+  const handleLike = async () => {
+    const res = await onLike();
+    if (res) { setLiked(res.liked); setCount(res.count); }
+  };
+
   return (
     <article className={"proj-card" + (p.pinned ? " pinned" : "")}>
       <ProjectThumb p={p} />
@@ -587,12 +600,7 @@ function ProjectCard({ p }: ProjectCardProps) {
         <div className="proj-foot">
           <button
             className={"like " + (liked ? "liked" : "")}
-            onClick={() => {
-              setLiked((l) => {
-                setCount((c) => c + (l ? -1 : 1));
-                return !l;
-              });
-            }}
+            onClick={handleLike}
           >
             <Icon name={liked ? "heart-fill" : "heart"} size={13} />
             <span className="mono">{count.toLocaleString()}</span>
@@ -637,11 +645,15 @@ interface PostComment {
 
 interface PostCardProps {
   post: Post;
+  initialLiked: boolean;
+  onLike: () => Promise<{ liked: boolean; count: number } | null>;
 }
 
-function PostCard({ post }: PostCardProps) {
-  const [liked, setLiked] = useState(false);
+function PostCard({ post, initialLiked, onLike }: PostCardProps) {
+  const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(post.likes);
+
+  useEffect(() => { setLiked(initialLiked); }, [initialLiked]);
   const [open, setOpen] = useState(false);
   const [comments, setComments] = useState<PostComment[]>([]);
   const [draft, setDraft] = useState("");
@@ -678,11 +690,9 @@ function PostCard({ post }: PostCardProps) {
       <div className="post-foot">
         <button
           className={"like " + (liked ? "liked" : "")}
-          onClick={() => {
-            setLiked((l) => {
-              setLikeCount((c) => c + (l ? -1 : 1));
-              return !l;
-            });
+          onClick={async () => {
+            const res = await onLike();
+            if (res) { setLiked(res.liked); setLikeCount(res.count); }
           }}
         >
           <Icon name={liked ? "heart-fill" : "heart"} size={14} />
@@ -774,7 +784,15 @@ function PostCard({ post }: PostCardProps) {
 
 // ─── Feed View ────────────────────────────────────────────────────────────────
 
-function FeedView({ posts }: { posts: Post[] }) {
+function FeedView({
+  posts,
+  likedIds,
+  onLike,
+}: {
+  posts: Post[];
+  likedIds: Set<string>;
+  onLike: (id: string) => Promise<{ liked: boolean; count: number } | null>;
+}) {
   return (
     <div className="feed-wrap">
       <div className="feed-head">
@@ -785,7 +803,12 @@ function FeedView({ posts }: { posts: Post[] }) {
       </div>
       <div className="post-list">
         {posts.map((p) => (
-          <PostCard key={p.id} post={p} />
+          <PostCard
+            key={p.id}
+            post={p}
+            initialLiked={likedIds.has(p.id)}
+            onLike={() => onLike(p.id)}
+          />
         ))}
       </div>
     </div>
@@ -889,6 +912,43 @@ export default function PortfolioClient({
   const [view, setView] = useState("profile");
   const [tab, setTab] = useState("experiences");
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [likedIds, setLikedIds] = useState<Record<string, Set<string>>>({
+    post: new Set(),
+    project: new Set(),
+    experience: new Set(),
+  });
+
+  useEffect(() => {
+    fetch("/api/likes")
+      .then((r) => r.json())
+      .then((data) => {
+        setLikedIds({
+          post: new Set(data.post ?? []),
+          project: new Set(data.project ?? []),
+          experience: new Set(data.experience ?? []),
+        });
+      })
+      .catch(() => {});
+  }, []);
+
+  const toggleLike = useCallback(
+    async (entity_type: string, entity_id: string): Promise<{ liked: boolean; count: number } | null> => {
+      const res = await fetch("/api/likes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entity_type, entity_id }),
+      });
+      if (!res.ok) return null;
+      const { liked, count } = await res.json();
+      setLikedIds((prev) => {
+        const next = new Set(prev[entity_type]);
+        liked ? next.add(entity_id) : next.delete(entity_id);
+        return { ...prev, [entity_type]: next };
+      });
+      return { liked, count };
+    },
+    []
+  );
 
   const copyEmail = () => {
     navigator.clipboard?.writeText(PROFILE.email);
@@ -911,19 +971,36 @@ export default function PortfolioClient({
             {tab === "experiences" ? (
               <div className="exp-list">
                 {experiences.map((e, i) => (
-                  <ExperienceCard key={e.id} exp={e} idx={i} />
+                  <ExperienceCard
+                    key={e.id}
+                    exp={e}
+                    idx={i}
+                    initialLiked={likedIds.experience.has(e.id)}
+                    onLike={() => toggleLike("experience", e.id)}
+                  />
                 ))}
               </div>
             ) : (
               <div className="proj-grid">
                 {projects.map((p) => (
-                  <ProjectCard key={p.id} p={p} />
+                  <ProjectCard
+                    key={p.id}
+                    p={p}
+                    initialLiked={likedIds.project.has(p.id)}
+                    onLike={() => toggleLike("project", p.id)}
+                  />
                 ))}
               </div>
             )}
           </>
         )}
-        {view === "feed" && <FeedView posts={posts} />}
+        {view === "feed" && (
+          <FeedView
+            posts={posts}
+            likedIds={likedIds.post}
+            onLike={(id) => toggleLike("post", id)}
+          />
+        )}
         {view === "message" && <MessageView />}
       </main>
 
