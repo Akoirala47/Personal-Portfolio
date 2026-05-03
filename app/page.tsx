@@ -1,6 +1,8 @@
 import { supabase } from "@/lib/supabase";
-import { Experience, Project, Post } from "@/lib/types";
+import { Experience, Project, Post, ReadingItem } from "@/lib/types";
 import PortfolioClient from "./PortfolioClient";
+
+export const dynamic = "force-dynamic";
 
 async function getExperiences(): Promise<Experience[]> {
   const { data, error } = await supabase
@@ -41,11 +43,25 @@ async function getPosts(): Promise<Post[]> {
   return data ?? [];
 }
 
+async function getReadingItems(): Promise<ReadingItem[]> {
+  const { data, error } = await supabase
+    .from("reading_items")
+    .select("*")
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching reading items:", error);
+    return [];
+  }
+  return data ?? [];
+}
+
 export default async function Home() {
-  const [experiences, projects, posts] = await Promise.all([
+  const [experiences, projects, posts, readingItems] = await Promise.all([
     getExperiences(),
     getProjects(),
     getPosts(),
+    getReadingItems(),
   ]);
 
   return (
@@ -53,6 +69,7 @@ export default async function Home() {
       experiences={experiences}
       projects={projects}
       posts={posts}
+      readingItems={readingItems}
     />
   );
 }

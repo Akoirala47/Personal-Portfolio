@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Experience, Project, Post } from "@/lib/types";
+import { Experience, Project, Post, ReadingItem } from "@/lib/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { id: "posts", label: "Posts" },
   { id: "experiences", label: "Experiences" },
   { id: "projects", label: "Projects" },
+  { id: "sidebar", label: "Sidebar" },
 ] as const;
 
 type NavTab = (typeof NAV_ITEMS)[number]["id"];
@@ -36,10 +37,11 @@ interface PostsTabProps {
 interface PostFormState {
   title: string;
   excerpt: string;
+  content: string;
   read_time: string;
 }
 
-const EMPTY_POST: PostFormState = { title: "", excerpt: "", read_time: "5 min read" };
+const EMPTY_POST: PostFormState = { title: "", excerpt: "", content: "", read_time: "5 min read" };
 
 function PostsTab({ posts, onRefresh }: PostsTabProps) {
   const [showForm, setShowForm] = useState(false);
@@ -55,7 +57,7 @@ function PostsTab({ posts, onRefresh }: PostsTabProps) {
 
   const openEdit = (post: Post) => {
     setEditId(post.id);
-    setForm({ title: post.title, excerpt: post.excerpt, read_time: post.read_time });
+    setForm({ title: post.title, excerpt: post.excerpt, content: post.content ?? "", read_time: post.read_time });
     setShowForm(true);
   };
 
@@ -121,6 +123,16 @@ function PostsTab({ posts, onRefresh }: PostsTabProps) {
               value={form.excerpt}
               onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
               required
+            />
+          </div>
+          <div className="form-field">
+            <label className="form-label">Content (optional — shown on post page)</label>
+            <textarea
+              className="form-input form-textarea"
+              value={form.content}
+              onChange={(e) => setForm({ ...form, content: e.target.value })}
+              rows={10}
+              placeholder="Write the full post here. Separate paragraphs with a blank line."
             />
           </div>
           <div className="form-field" style={{ maxWidth: 200 }}>
@@ -915,6 +927,125 @@ function ProjectsTab({ projects, onRefresh }: ProjectsTabProps) {
   );
 }
 
+// ─── Sidebar Tab ─────────────────────────────────────────────────────────────
+
+interface SidebarTabProps {
+  readingItems: ReadingItem[];
+  onRefresh: () => void;
+}
+
+const EMPTY_READING = { tag: "", title: "" };
+
+function SidebarTab({ readingItems, onRefresh }: SidebarTabProps) {
+  const [form, setForm] = useState(EMPTY_READING);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const openEdit = (item: ReadingItem) => {
+    setEditId(item.id);
+    setForm({ tag: item.tag, title: item.title });
+  };
+
+  const reset = () => {
+    setEditId(null);
+    setForm(EMPTY_READING);
+  };
+
+  const handleSave = async (e: FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      if (editId) {
+        await fetch(`/api/reading/${editId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+      } else {
+        await fetch("/api/reading", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, display_order: readingItems.length }),
+        });
+      }
+      reset();
+      onRefresh();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    await fetch(`/api/reading/${id}`, { method: "DELETE" });
+    onRefresh();
+  };
+
+  return (
+    <div className="admin-tab">
+      <div className="admin-section-header">
+        <h2 className="admin-section-title">Currently reading</h2>
+        <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>
+          Shown in the sidebar of the portfolio
+        </p>
+      </div>
+
+      <form onSubmit={handleSave} className="admin-form">
+        <div className="admin-form-row">
+          <input
+            className="admin-input"
+            placeholder="tag (e.g. paper, book, article)"
+            value={form.tag}
+            onChange={(e) => setForm({ ...form, tag: e.target.value })}
+            required
+          />
+          <input
+            className="admin-input"
+            placeholder="title"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            required
+          />
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="admin-btn admin-btn-primary" type="submit" disabled={saving}>
+            {saving ? "Saving…" : editId ? "Update" : "Add item"}
+          </button>
+          {editId && (
+            <button className="admin-btn" type="button" onClick={reset}>
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
+
+      <div className="admin-list">
+        {readingItems.map((item) => (
+          <div key={item.id} className="admin-list-item">
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <span className="post-tag">{item.tag}</span>
+              <span>{item.title}</span>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button className="admin-btn admin-btn-sm" onClick={() => openEdit(item)}>
+                Edit
+              </button>
+              <button
+                className="admin-btn admin-btn-sm admin-btn-danger"
+                onClick={() => handleDelete(item.id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+        {readingItems.length === 0 && (
+          <p style={{ color: "var(--text-3)", fontSize: 13 }}>No items yet.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Admin Dashboard ──────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
@@ -923,16 +1054,19 @@ export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [readingItems, setReadingItems] = useState<ReadingItem[]>([]);
 
   const fetchAll = async () => {
-    const [postsRes, expRes, projRes] = await Promise.all([
+    const [postsRes, expRes, projRes, readingRes] = await Promise.all([
       fetch("/api/posts"),
       fetch("/api/experiences"),
       fetch("/api/projects"),
+      fetch("/api/reading"),
     ]);
     if (postsRes.ok) setPosts(await postsRes.json());
     if (expRes.ok) setExperiences(await expRes.json());
     if (projRes.ok) setProjects(await projRes.json());
+    if (readingRes.ok) setReadingItems(await readingRes.json());
   };
 
   useEffect(() => {
@@ -987,6 +1121,9 @@ export default function AdminDashboard() {
           )}
           {activeTab === "projects" && (
             <ProjectsTab projects={projects} onRefresh={fetchAll} />
+          )}
+          {activeTab === "sidebar" && (
+            <SidebarTab readingItems={readingItems} onRefresh={fetchAll} />
           )}
         </div>
       </div>

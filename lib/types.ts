@@ -32,8 +32,16 @@ export interface Post {
   id: string;
   title: string;
   excerpt: string;
+  content: string | null;
   read_time: string;
   likes: number;
   published_at: string;
   created_at: string;
+}
+
+export interface ReadingItem {
+  id: string;
+  tag: string;
+  title: string;
+  display_order: number;
 }

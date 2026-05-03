@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { PROFILE } from "@/lib/profile";
-import { Experience, Project, Post } from "@/lib/types";
+import { Experience, Project, Post, ReadingItem } from "@/lib/types";
 import Image from "next/image";
 
 // ─── SVG Icons ───────────────────────────────────────────────────────────────
@@ -147,9 +148,10 @@ function Icon({ name, size = 20 }: IconProps) {
 interface SidebarProps {
   view: string;
   setView: (view: string) => void;
+  readingItems: ReadingItem[];
 }
 
-function Sidebar({ view, setView }: SidebarProps) {
+function Sidebar({ view, setView, readingItems }: SidebarProps) {
   const items = [
     { id: "feed", label: "Feed", icon: "feed", badge: null as number | null },
     { id: "profile", label: "Profile", icon: "profile", badge: null },
@@ -221,25 +223,25 @@ function Sidebar({ view, setView }: SidebarProps) {
           <span />
         </div>
         <div className="np-text">
-          <div className="np-title">deep focus · neural ambient</div>
-          <div className="np-sub">{PROFILE.location} · live</div>
+          <div className="np-title">SWE II · Walmart Global Tech</div>
+          <div className="np-sub">on shift · present</div>
         </div>
       </div>
 
       <div className="side-section-label">Currently reading</div>
       <div className="reading">
-        <div className="reading-row">
-          <span className="r-tag">paper</span>
-          <span className="r-title">The Forward-Forward Algorithm</span>
-        </div>
-        <div className="reading-row">
-          <span className="r-tag">paper</span>
-          <span className="r-title">Cross-layer SAE features</span>
-        </div>
-        <div className="reading-row">
-          <span className="r-tag">book</span>
-          <span className="r-title">The Information — Gleick</span>
-        </div>
+        {readingItems.length > 0 ? (
+          readingItems.map((item) => (
+            <div key={item.id} className="reading-row">
+              <span className="r-tag">{item.tag}</span>
+              <span className="r-title">{item.title}</span>
+            </div>
+          ))
+        ) : (
+          <div className="reading-row">
+            <span className="r-title mono" style={{ color: "var(--text-3)" }}>nothing right now</span>
+          </div>
+        )}
       </div>
 
       <div className="footer-mini">
@@ -694,13 +696,9 @@ function PostCard({ post }: PostCardProps) {
           <span className="mono">share</span>
         </button>
         <span className="post-foot-spacer" />
-        <a
-          className="post-readmore mono"
-          href="#"
-          onClick={(e) => e.preventDefault()}
-        >
+        <Link className="post-readmore mono" href={`/posts/${post.id}`}>
           read full →
-        </a>
+        </Link>
       </div>
 
       {open && (
@@ -878,12 +876,14 @@ interface PortfolioClientProps {
   experiences: Experience[];
   projects: Project[];
   posts: Post[];
+  readingItems: ReadingItem[];
 }
 
 export default function PortfolioClient({
   experiences,
   projects,
   posts,
+  readingItems,
 }: PortfolioClientProps) {
   const [view, setView] = useState("profile");
   const [tab, setTab] = useState("experiences");
@@ -897,7 +897,7 @@ export default function PortfolioClient({
 
   return (
     <div className="app">
-      <Sidebar view={view} setView={setView} />
+      <Sidebar view={view} setView={setView} readingItems={readingItems} />
       <main className="main">
         {view === "profile" && (
           <>
