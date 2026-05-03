@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>aayush.koirala — portfolio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='monospace' font-weight='700' font-size='18' fill='%23ff5722'%3Eak%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="sidebar.jsx"></script>
+<script type="text/babel" src="profile.jsx"></script>
+<script type="text/babel" src="feed.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentPair": "amber-rose",
+  "photoShape": "circle",
+  "density": "regular",
+  "showSidebarMeta": true
+}/*EDITMODE-END*/;
+
+const ACCENT_PAIRS = {
+  "orange-purple": ["oklch(0.7 0.18 30)",  "oklch(0.65 0.18 290)"],
+  "green-cyan":    ["oklch(0.78 0.16 145)","oklch(0.72 0.14 220)"],
+  "purple-cyan":   ["oklch(0.65 0.18 290)","oklch(0.72 0.14 220)"],
+  "amber-rose":    ["oklch(0.78 0.16 75)", "oklch(0.7 0.18 10)"],
+};
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [view, setView] = React.useState("profile"); // profile | feed | message
+  const [tab, setTab] = React.useState("experiences");
+  const [copiedEmail, setCopiedEmail] = React.useState(false);
+
+  // Apply accent pair + density to root.
+  React.useEffect(() => {
+    const [a1, a2] = ACCENT_PAIRS[t.accentPair] || ACCENT_PAIRS["orange-purple"];
+    document.documentElement.style.setProperty("--accent-1", a1);
+    document.documentElement.style.setProperty("--accent-2", a2);
+    document.documentElement.style.setProperty("--accent-1-dim", a1.replace(")", " / 0.16)"));
+    document.documentElement.style.setProperty("--accent-2-dim", a2.replace(")", " / 0.16)"));
+    document.documentElement.setAttribute("data-density", t.density);
+  }, [t.accentPair, t.density]);
+
+  const copyEmail = () => {
+    navigator.clipboard?.writeText(PROFILE.email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 1600);
+  };
+
+  return (
+    <div className="app">
+      <Sidebar view={view} setView={setView} t={t}/>
+      <main className="main">
+        {view === "profile" && (
+          <>
+            <ProfileHeader t={t} copyEmail={copyEmail} copiedEmail={copiedEmail}/>
+            <Tabs tab={tab} setTab={setTab} counts={{exp: EXPERIENCES.length, proj: PROJECTS.length}}/>
+            {tab === "experiences" ? <ExperiencesView/> : <ProjectsView/>}
+          </>
+        )}
+        {view === "feed" && <FeedView/>}
+        {view === "message" && <MessageView/>}
+      </main>
+
+      <div className="corner-pill">
+        <span className="live-dot"/> live · v4.0
+      </div>
+
+      <TweaksPanel>
+        <TweakSection label="Theme"/>
+        <TweakSelect
+          label="Accent palette"
+          value={t.accentPair}
+          options={[
+            {value: "orange-purple", label: "Hot orange + electric purple"},
+            {value: "green-cyan",    label: "Terminal green + steel cyan"},
+            {value: "purple-cyan",   label: "Purple + cyan"},
+            {value: "amber-rose",    label: "Amber + rose"},
+          ]}
+          onChange={v => setTweak("accentPair", v)}
+        />
+        <TweakSection label="Layout"/>
+        <TweakRadio
+          label="Photo shape"
+          value={t.photoShape}
+          options={["circle","square","glitch"]}
+          onChange={v => setTweak("photoShape", v)}
+        />
+        <TweakRadio
+          label="Density"
+          value={t.density}
+          options={["compact","regular","cozy"]}
+          onChange={v => setTweak("density", v)}
+        />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
