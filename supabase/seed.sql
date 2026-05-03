@@ -117,3 +117,4 @@ insert into posts (title, excerpt, read_time, likes, published_at) values
   143,
   now() - interval '7 days'
 );
+ 
